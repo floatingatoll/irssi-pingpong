@@ -1,3 +1,7 @@
+# Ping-pong. Someone says "ping", you say "pong".
+# GPLv2, apparently, so we'll stick with that.
+#
+# Derived from:
 # CopyLeft Riku Voipio 2001
 # half-life bot script
 use Irssi;
@@ -6,49 +10,46 @@ use vars qw($VERSION %IRSSI);
 
 # header begins here
 
-$VERSION = "1.2";
+$VERSION = "1.1";
 %IRSSI = (
-        authors     => "Riku Voipio",
-        contact     => "riku.voipio\@iki.fi",
-        name        => "half-life",
-        description => "responds to \"!hl counterstrike.server \" command on channels/msg's to query counter-strike servers",
-        license     => "GPLv2",
-        url         => "http://nchip.ukkosenjyly.mine.nu/irssiscripts/",
-    );
+    authors     => 'Richard Soderberg',
+    contact     => 'rsoderberg@gmail.com',
+    name        => 'pingpong',
+    description => 'Replies to pings with pongs',
+    license     => 'GPLv2',
+    url         => 'https://github.com/floatingatoll/pingpong',
+);
 
-
-$qdir="/home/nchip/qstat/";
-
-sub cmd_hl {
-        my ($server, $data, $nick, $mask, $target) =@_;
-	if ($data=~/^!hl/){
-		@foo=split(/\s+/,$data);
-		$len=@foo;
-		if ($len==1){
-		    $foo[1]="turpasauna.taikatech.com";
-		}
-		#fixme, haxxor protection
-		$word=$foo[1];
-		$_=$word;
-		$word=~s/[^a-zA-ZäöÄÖ0-9\.]/ /g;
-		open(DAT, "$qdir"."qstat -hls ".$word."|");
-		$count=0;
-		foreach $line (<DAT>)
-		{
-			if ($count==1)
-			{
-				$_=$line;
-				$line=~s/\s+/ /g;
-				#print($line);
-				$server->command("/notice ".$target." ".$line);
-			}
-			$count++;
-		}
-		close(DAT);
-	}
+use vars qw(%pingpong_timeout);
+sub cmd_pingpong_public {
+    my ($server, $data, $nick, $mask, $target) =@_;
+    if ($data =~ /ping/) {
+        my $current_nickname = $server->{nick};
+        if ($data=~/^\s*${current_nickname}[:;]?\s*ping\s*$/i){
+            my $now = time;
+            if (!exists($pingpong_timeout{$target}) || $now >= $pingpong_timeout{$target}) {
+                $server->command("/msg ${target} public current:${current_nickname} target:${target} nick:${nick} timeout:$pingpong_timeout{$target} now:$now");
+                $pingpong_timeout{$target} = $now + 3600;
+            }
+        }
+    }
 }
 
-Irssi::signal_add_last('message public', 'cmd_hl');
-Irssi::print("Half-life info bot by nchip loaded.");
+sub cmd_pingpong_private {
+    my ($server, $data, $nick, $mask, $target) =@_;
+    if ($data =~ /ping/) {
+        my $current_nickname = $server->{nick};
+        if ($data=~/^\s*(?:${current_nickname}[:;]?)?\s*ping\s*$/i){
+            my $now = time;
+            if (!exists($pingpong_timeout{$target}) || $now >= $pingpong_timeout{$target}) {
+                $server->command("/msg ${nick} private current:${current_nickname} target:${target} nick:${nick} timeout:$pingpong_timeout{$target}");
+                $pingpong_timeout{$target} = $now + 3600;
+            }
+        }
+    }
+} 
 
+Irssi::signal_add_last('message public', 'cmd_pingpong_public');
+Irssi::signal_add_last('message private', 'cmd_pingpong_private');
 
+Irssi::print("Pingpong loaded.");
