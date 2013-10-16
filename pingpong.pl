@@ -40,7 +40,7 @@ $VERSION = "1.1";
     name        => 'pingpong',
     description => 'Replies to pings with pongs',
     license     => 'GPLv2',
-    url         => 'https://github.com/floatingatoll/pingpong',
+    url         => 'https://github.com/floatingatoll/irssi-pingpong',
 );
 
 use vars qw(%pingpong_timeout);
