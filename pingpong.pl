@@ -50,7 +50,7 @@ sub cmd_pingpong_public {
     my ($server, $data, $nick, $mask, $target) =@_;
     if ($data =~ /ping/) {
         my $current_nickname = $server->{nick};
-        if ($data=~/^\s*${current_nickname}[:;]?\s*ping\s*$/i){
+        if ($current_nickname ne $nick && $data=~/^\s*${current_nickname}[:;]?\s*ping\s*$/i){
             my $now = time;
             if (!exists($pingpong_timeout{$target}) || $now >= $pingpong_timeout{$target}) {
                 my $reply = $PINGPONG_REPLY->($current_nickname, $nick, $target);
@@ -65,7 +65,7 @@ sub cmd_pingpong_private {
     my ($server, $data, $nick, $mask, $target) =@_;
     if ($data =~ /ping/) {
         my $current_nickname = $server->{nick};
-        if ($data=~/^\s*(?:${current_nickname}[:;]?)?\s*ping\s*$/i){
+        if ($current_nickname ne $nick && $data=~/^\s*(?:${current_nickname}[:;]?)?\s*ping\s*$/i){
             my $now = time;
             if (!exists($pingpong_timeout{$target}) || $now >= $pingpong_timeout{$target}) {
                 my $reply = $PINGPONG_REPLY->($current_nickname, $nick, $target);
