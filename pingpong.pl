@@ -44,6 +44,8 @@ $VERSION = "1.1";
 );
 
 use vars qw(%pingpong_timeout);
+%pingpong_timeout = ();
+
 sub cmd_pingpong_public {
     my ($server, $data, $nick, $mask, $target) =@_;
     if ($data =~ /ping/) {
