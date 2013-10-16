@@ -67,7 +67,7 @@ sub cmd_pingpong_private {
             my $now = time;
             if (!exists($pingpong_timeout{$target}) || $now >= $pingpong_timeout{$target}) {
                 my $reply = $PINGPONG_REPLY->($current_nickname, $nick, $target);
-                $server->command("/msg ${target} ${reply}");
+                $server->command("/msg ${nick} ${reply}");
                 $pingpong_timeout{$target} = $now + 3600;
             }
         }
